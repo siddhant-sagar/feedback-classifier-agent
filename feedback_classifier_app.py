@@ -95,7 +95,7 @@ if "scheduler_started" not in st.session_state:
     st.session_state.scheduler_started = True
 
 # UI
-st.title("🧠 Product Feedback Classifier (AI Agent)")
+st.title("Product Feedback Classifier (AI Agent)")
 
 uploaded_file = st.file_uploader("Upload CSV File with 'Feedback' column", type="csv")
 
@@ -108,25 +108,25 @@ if uploaded_file:
             st.success("Classification complete!")
             st.dataframe(df_result)
 
-            st.markdown("### 📊 Category Distribution (Seaborn)")
+            st.markdown("### Category Distribution 📊")
             fig1, ax1 = plt.subplots()
             sns.countplot(data=df_result, x="Category", order=df_result["Category"].value_counts().index, ax=ax1)
             plt.xticks(rotation=45)
             st.pyplot(fig1)
 
-            st.markdown("### 📈 Sentiment Analysis (Seaborn)")
+            st.markdown("### Sentiment Analysis 📈")
             fig2, ax2 = plt.subplots()
             sns.countplot(data=df_result, x="Sentiment", order=["Positive", "Neutral", "Negative"], ax=ax2)
             st.pyplot(fig2)
 
-            st.markdown("### 🔍 Advanced Analytics (Plotly)")
+            st.markdown("### Advanced Analytics 🔍")
             fig3 = px.sunburst(df_result, path=["Category", "Sentiment"], title="Category vs Sentiment")
             st.plotly_chart(fig3)
 
             fig4 = px.histogram(df_result, x="Category", color="Sentiment", barmode="group", title="Category by Sentiment")
             st.plotly_chart(fig4)
 
-            st.markdown("### ☁️ Keyword Word Cloud from Feedback")
+            st.markdown("### Keyword Word Cloud from Feedback ☁️")
             all_feedback_text = " ".join(df_result["Feedback"].dropna().astype(str))
             
             # Load stopwords
