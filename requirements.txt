@@ -7,3 +7,4 @@ textblob
 matplotlib
 seaborn
 plotly
+wordcloud
