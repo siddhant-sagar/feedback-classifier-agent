@@ -95,7 +95,7 @@ if "scheduler_started" not in st.session_state:
     st.session_state.scheduler_started = True
 
 # UI
-st.title("Product Feedback Classifier (AI Agent)")
+st.title("Product Feedback Classifier Agent")
 
 uploaded_file = st.file_uploader("Upload CSV File with 'Feedback' column", type="csv")
 
