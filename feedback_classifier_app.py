@@ -14,6 +14,8 @@ from textblob import TextBlob
 import matplotlib.pyplot as plt
 import seaborn as sns
 import plotly.express as px
+from collections import Counter
+import re
 
 # Load environment variables
 load_dotenv()
@@ -48,6 +50,13 @@ def analyze_sentiment(feedback_text):
         return "Negative"
     else:
         return "Neutral"
+
+def extract_keywords(text, top_n=10):
+    words = re.findall(r'\b\w+\b', text.lower())
+    stopwords = set(pd.read_csv("https://raw.githubusercontent.com/stopwords-iso/stopwords-en/master/stopwords-en.txt", header=None)[0])
+    filtered_words = [word for word in words if word not in stopwords and len(word) > 2]
+    word_counts = Counter(filtered_words)
+    return word_counts.most_common(top_n)
 
 def send_email(subject, body):
     msg = MIMEText(body)
@@ -115,6 +124,13 @@ if uploaded_file:
 
             fig4 = px.histogram(df_result, x="Category", color="Sentiment", barmode="group", title="Category by Sentiment")
             st.plotly_chart(fig4)
+
+            st.markdown("### 🗝️ Top Keywords in Feedback")
+            all_feedback_text = " ".join(df_result["Feedback"].dropna().astype(str))
+            keywords = extract_keywords(all_feedback_text)
+            keywords_df = pd.DataFrame(keywords, columns=["Keyword", "Frequency"])
+            fig5 = px.bar(keywords_df, x="Keyword", y="Frequency", title="Top Keywords in Feedback")
+            st.plotly_chart(fig5)
 
 # Run scheduler loop manually (simulated cron)
 for _ in range(3):
