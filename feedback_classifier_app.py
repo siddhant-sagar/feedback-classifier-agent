@@ -10,6 +10,10 @@ from email.mime.text import MIMEText
 from dotenv import load_dotenv
 from google.generativeai import configure, GenerativeModel
 import random
+from textblob import TextBlob
+import matplotlib.pyplot as plt
+import seaborn as sns
+import plotly.express as px
 
 # Load environment variables
 load_dotenv()
@@ -35,6 +39,16 @@ def classify_feedback(feedback_text):
     except Exception as e:
         return f"Error: {e}"
 
+def analyze_sentiment(feedback_text):
+    blob = TextBlob(feedback_text)
+    polarity = blob.sentiment.polarity
+    if polarity > 0.1:
+        return "Positive"
+    elif polarity < -0.1:
+        return "Negative"
+    else:
+        return "Neutral"
+
 def send_email(subject, body):
     msg = MIMEText(body)
     msg["Subject"] = subject
@@ -56,6 +70,7 @@ def run_classification(uploaded_file):
         st.error("CSV must contain a 'Feedback' column.")
         return None
     df["Category"] = df["Feedback"].apply(classify_feedback)
+    df["Sentiment"] = df["Feedback"].apply(analyze_sentiment)
     summary = df["Category"].value_counts().to_string()
     send_email("Daily Feedback Classification Summary", summary)
     return df
@@ -82,6 +97,24 @@ if uploaded_file:
             st.session_state.classified_df = df_result
             st.success("Classification complete!")
             st.dataframe(df_result)
+
+            st.markdown("### 📊 Category Distribution (Seaborn)")
+            fig1, ax1 = plt.subplots()
+            sns.countplot(data=df_result, x="Category", order=df_result["Category"].value_counts().index, ax=ax1)
+            plt.xticks(rotation=45)
+            st.pyplot(fig1)
+
+            st.markdown("### 📈 Sentiment Analysis (Seaborn)")
+            fig2, ax2 = plt.subplots()
+            sns.countplot(data=df_result, x="Sentiment", order=["Positive", "Neutral", "Negative"], ax=ax2)
+            st.pyplot(fig2)
+
+            st.markdown("### 🔍 Advanced Analytics (Plotly)")
+            fig3 = px.sunburst(df_result, path=["Category", "Sentiment"], title="Category vs Sentiment")
+            st.plotly_chart(fig3)
+
+            fig4 = px.histogram(df_result, x="Category", color="Sentiment", barmode="group", title="Category by Sentiment")
+            st.plotly_chart(fig4)
 
 # Run scheduler loop manually (simulated cron)
 for _ in range(3):
