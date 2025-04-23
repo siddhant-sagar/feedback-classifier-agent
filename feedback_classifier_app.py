@@ -15,6 +15,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import plotly.express as px
 from collections import Counter
+from wordcloud import WordCloud
 import re
 
 # Load environment variables
@@ -125,12 +126,21 @@ if uploaded_file:
             fig4 = px.histogram(df_result, x="Category", color="Sentiment", barmode="group", title="Category by Sentiment")
             st.plotly_chart(fig4)
 
-            st.markdown("### 🗝️ Top Keywords in Feedback")
+            st.markdown("### ☁️ Keyword Word Cloud from Feedback")
             all_feedback_text = " ".join(df_result["Feedback"].dropna().astype(str))
-            keywords = extract_keywords(all_feedback_text)
-            keywords_df = pd.DataFrame(keywords, columns=["Keyword", "Frequency"])
-            fig5 = px.bar(keywords_df, x="Keyword", y="Frequency", title="Top Keywords in Feedback")
-            st.plotly_chart(fig5)
+            
+            # Load stopwords
+            stopwords_set = set(pd.read_csv("https://raw.githubusercontent.com/stopwords-iso/stopwords-en/master/stopwords-en.txt", header=None)[0])
+            words = re.findall(r'\b\w+\b', all_feedback_text.lower())
+            filtered_text = " ".join([word for word in words if word not in stopwords_set and len(word) > 2])
+            
+            # Generate word cloud
+            wordcloud = WordCloud(width=800, height=400, background_color="white", colormap="viridis").generate(filtered_text)
+            
+            fig6, ax6 = plt.subplots(figsize=(10, 5))
+            ax6.imshow(wordcloud, interpolation="bilinear")
+            ax6.axis("off")
+            st.pyplot(fig6)
 
 # Run scheduler loop manually (simulated cron)
 for _ in range(3):
