@@ -9,6 +9,7 @@ import smtplib
 from email.mime.text import MIMEText
 from dotenv import load_dotenv
 from google.generativeai import configure, GenerativeModel
+import random
 
 # Load environment variables
 load_dotenv()
@@ -19,7 +20,7 @@ RECIPIENT_EMAIL = os.getenv("RECIPIENT_EMAIL")
 
 # Gemini configuration
 configure(api_key=GEMINI_API_KEY)
-model = GenerativeModel("gemini-2.0-flash")
+model = GenerativeModel("models/gemini-2.0-flash")
 
 def classify_feedback(feedback_text):
     prompt = f"""
@@ -29,6 +30,7 @@ def classify_feedback(feedback_text):
     """
     try:
         response = model.generate_content(prompt)
+        time.sleep(random.uniform(2.5, 4.5))  # Throttle to avoid rate limits
         return response.text.strip()
     except Exception as e:
         return f"Error: {e}"
