@@ -19,7 +19,7 @@ RECIPIENT_EMAIL = os.getenv("RECIPIENT_EMAIL")
 
 # Gemini configuration
 configure(api_key=GEMINI_API_KEY)
-model = GenerativeModel("models/gemini-pro")
+model = GenerativeModel("gemini-2.0-flash")
 
 def classify_feedback(feedback_text):
     prompt = f"""
